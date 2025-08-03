@@ -239,7 +239,7 @@ setup_arch() {
             CONFIG_ARCH="mips64"
             ;;
         *)
-            echo "Unknown architecture: $arch"
+            log_error "Unknown architecture: $arch"
             return 1
             ;;
     esac

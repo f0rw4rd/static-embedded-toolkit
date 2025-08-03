@@ -48,27 +48,23 @@ build_dependency_generic() {
     
     if ! $configure_func "$arch" "$build_dir" "$cache_dir"; then
         log_error "Configuration failed for $dep_name on $arch"
-        cd /
-        rm -rf "$build_dir"
+        cleanup_build_dir "$build_dir"
         return 1
     fi
     
     if ! $build_func "$arch" "$build_dir"; then
         log_error "Build failed for $dep_name on $arch"
-        cd /
-        rm -rf "$build_dir"
+        cleanup_build_dir "$build_dir"
         return 1
     fi
     
     if ! $install_func install "$cache_dir" "$build_dir"; then
         log_error "Installation failed for $dep_name on $arch"
-        cd /
-        rm -rf "$build_dir"
+        cleanup_build_dir "$build_dir"
         return 1
     fi
     
-    cd /
-    rm -rf "$build_dir"
+    cleanup_build_dir "$build_dir"
     
     echo "$cache_dir"
     return 0

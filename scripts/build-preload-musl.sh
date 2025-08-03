@@ -28,7 +28,7 @@ while [ $# -gt 0 ]; do
             shift
             ;;
         *)
-            echo "Unknown argument: $1"
+            log_error "Unknown argument: $1"
             exit 1
             ;;
     esac
@@ -131,16 +131,14 @@ build_preload_musl() {
             
             cp "${lib}.so" "$output_dir/" || {
                 log_tool "$arch" "Failed to copy library"
-                cd /
-                rm -rf "$build_dir"
+                cleanup_build_dir "$build_dir"
                 return 1
             }
             
             local size=$(get_binary_size "$output_dir/${lib}.so")
             log_tool "$arch" "Successfully built: ${lib}.so ($size)"
             
-            cd /
-            rm -rf "$build_dir"
+            cleanup_build_dir "$build_dir"
             return 0
         else
             log_tool "$arch" "Link failed"
@@ -149,8 +147,7 @@ build_preload_musl() {
         log_tool "$arch" "Compilation failed"
     fi
     
-    cd /
-    rm -rf "$build_dir"
+    cleanup_build_dir "$build_dir"
     return 1
 }
 
