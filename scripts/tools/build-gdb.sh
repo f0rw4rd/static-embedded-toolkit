@@ -46,26 +46,6 @@ build_gdb() {
     return 0
 }
 
-download_python() {
-    local arch=$1
-    
-    log_tool "python" "Downloading static Python for $arch..."
-    
-    if [ -f "/build/output/$arch/python3" ]; then
-        log_tool "python" "Already downloaded for $arch"
-        return 0
-    fi
-    
-    "$SCRIPT_DIR/download-python-static.sh" download "$arch" || {
-        log_tool "python" "Failed to download Python for $arch"
-        log_tool "python" "Note: Python is optional for GDB functionality"
-        return 0
-    }
-    
-    log_tool "python" "Successfully installed Python for $arch"
-    return 0
-}
-
 main() {
     local arch="${1:-}"
     local mode="${2:-release}"
@@ -75,15 +55,10 @@ main() {
         echo "Example: $0 x86_64"
         echo ""
         echo "This script downloads pre-built static GDB binaries from the gdb-static project"
-        echo "Optional: Also downloads static Python for enhanced GDB functionality"
         exit 1
     fi
     
     build_gdb "$arch" "$mode" || exit 1
-    
-    if [ "${DOWNLOAD_PYTHON:-false}" = "true" ]; then
-        download_python "$arch" || true
-    fi
 }
 
 main "$@"
