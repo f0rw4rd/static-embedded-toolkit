@@ -1,6 +1,7 @@
 #!/bin/sh
 set -e
 source "$(dirname "${BASH_SOURCE[0]}")/lib/logging.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/lib/build_helpers.sh"
 
 LIBS_TO_BUILD=""
 ARCHS_TO_BUILD=""
@@ -53,7 +54,7 @@ build_preload_musl() {
     mkdir -p "$output_dir"
     
     if [ -f "$output_dir/${lib}.so" ]; then
-        local size=$(ls -lh "$output_dir/${lib}.so" 2>/dev/null | awk '{print $5}')
+        local size=$(get_binary_size "$output_dir/${lib}.so")
         log_tool "$arch" "Already built: ${lib}.so ($size)"
         return 0
     fi
@@ -135,7 +136,7 @@ build_preload_musl() {
                 return 1
             }
             
-            local size=$(ls -lh "$output_dir/${lib}.so" 2>/dev/null | awk '{print $5}')
+            local size=$(get_binary_size "$output_dir/${lib}.so")
             log_tool "$arch" "Successfully built: ${lib}.so ($size)"
             
             cd /

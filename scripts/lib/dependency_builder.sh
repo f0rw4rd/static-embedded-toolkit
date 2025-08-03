@@ -42,11 +42,7 @@ build_dependency_generic() {
     local cflags=$(get_compile_flags "$arch" "$dep_name")
     local ldflags=$(get_link_flags "$arch")
     
-    export CC="${CROSS_COMPILE}gcc"
-    export CXX="${CROSS_COMPILE}g++"
-    export AR="${CROSS_COMPILE}ar"
-    export RANLIB="${CROSS_COMPILE}ranlib"
-    export STRIP="${CROSS_COMPILE}strip"
+    export_cross_compiler "$CROSS_COMPILE"
     export CFLAGS="$cflags"
     export LDFLAGS="$ldflags"
     

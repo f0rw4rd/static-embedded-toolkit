@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source "$(dirname "${BASH_SOURCE[0]}")/logging.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/build_helpers.sh"
 
 download_toolchain() {
     local arch=$1
@@ -259,12 +260,7 @@ setup_arch() {
     export HOST
     export CROSS_COMPILE
     export CONFIG_ARCH
-    export CC="${CROSS_COMPILE}gcc"
-    export CXX="${CROSS_COMPILE}g++"
-    export AR="${CROSS_COMPILE}ar"
-    export STRIP="${CROSS_COMPILE}strip"
-    export RANLIB="${CROSS_COMPILE}ranlib"
-    export LD="${CROSS_COMPILE}ld"
+    export_cross_compiler "$CROSS_COMPILE"
     
     if ! $CC --version >/dev/null 2>&1; then
         log_warn "Warning: Compiler $CC not found or not working for $arch"
@@ -284,7 +280,7 @@ check_binary_exists() {
     local skip_if_exists="${SKIP_IF_EXISTS:-true}"
     
     if [ "$skip_if_exists" = "true" ] && [ -f "/build/output/$arch/$binary" ]; then
-        local size=$(ls -lh "/build/output/$arch/$binary" | awk '{print $5}')
+        local size=$(get_binary_size "/build/output/$arch/$binary")
         log_tool "$binary" "Already built for $arch ($size), skipping..."
         return 0
     fi
