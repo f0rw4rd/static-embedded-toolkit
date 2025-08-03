@@ -7,8 +7,8 @@ BASE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 if [ -f "$SCRIPT_DIR/lib/logging.sh" ]; then
     source "$SCRIPT_DIR/lib/logging.sh"
 else
-    log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
-    log_error() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: $*" >&2; }
+    log() { log_tool "$(date '+%Y-%m-%d %H:%M:%S')" "$*"; }
+    log_error() { log_tool "$(date '+%Y-%m-%d %H:%M:%S')" "ERROR: $*" >&2; }
 fi
 
 if [ -f "$SCRIPT_DIR/lib/common.sh" ]; then
@@ -92,7 +92,7 @@ setup_arch_glibc() {
         xtensa)      TOOLCHAIN_PREFIX="xtensa" ;;
         m68k)        TOOLCHAIN_PREFIX="m68k" ;;
         *) 
-            echo "[$(date +%H:%M:%S)] ERROR: Unsupported architecture for glibc: $arch" >&2
+            log_tool "$(date +%H:%M:%S)" "ERROR: Unsupported architecture for glibc: $arch" >&2
             return 1
             ;;
     esac
@@ -128,7 +128,7 @@ setup_arch_glibc() {
     
     local toolchain_dir="${TOOLCHAINS_DIR}/${TOOLCHAIN_NAME}"
     if [ ! -d "$toolchain_dir" ]; then
-        echo "[$(date +%H:%M:%S)] ERROR: Toolchain not found for $arch at $toolchain_dir" >&2
+        log_tool "$(date +%H:%M:%S)" "ERROR: Toolchain not found for $arch at $toolchain_dir" >&2
         return 1
     fi
     
@@ -160,7 +160,7 @@ build_glibc_tool() {
     
     local build_script="${SCRIPT_DIR}/tools/build-${tool}.sh"
     if [ ! -f "$build_script" ]; then
-        echo "[$(date +%H:%M:%S)] ERROR: Build script not found: $build_script" >&2
+        log_tool "$(date +%H:%M:%S)" "ERROR: Build script not found: $build_script" >&2
         return 1
     fi
     
@@ -221,12 +221,12 @@ main() {
             if build_glibc_tool "$tool" "$arch" > "$log_file" 2>&1; then
                 success=$((success + 1))
                 echo ""
-                echo "[$musl_arch] ✓ $tool built successfully"
+                log_tool "$musl_arch" "✓ $tool built successfully"
             else
                 failed=$((failed + 1))
                 echo ""
-                echo "[$musl_arch] ✗ $tool build failed"
-                echo "[$musl_arch] Check log: $log_file"
+                log_tool "$musl_arch" "✗ $tool build failed"
+                log_tool "$musl_arch" "Check log: $log_file"
             fi
         done
     done

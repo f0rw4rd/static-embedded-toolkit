@@ -267,7 +267,7 @@ setup_arch() {
     export LD="${CROSS_COMPILE}ld"
     
     if ! $CC --version >/dev/null 2>&1; then
-        echo "Warning: Compiler $CC not found or not working for $arch"
+        log_warn "Warning: Compiler $CC not found or not working for $arch"
         echo "Toolchain may need to be downloaded or is incompatible"
     fi
     
@@ -285,7 +285,7 @@ check_binary_exists() {
     
     if [ "$skip_if_exists" = "true" ] && [ -f "/build/output/$arch/$binary" ]; then
         local size=$(ls -lh "/build/output/$arch/$binary" | awk '{print $5}')
-        echo "[$binary] Already built for $arch ($size), skipping..."
+        log_tool "$binary" "Already built for $arch ($size), skipping..."
         return 0
     fi
     return 1

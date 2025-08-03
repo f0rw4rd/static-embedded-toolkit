@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+source "$(dirname "${BASH_SOURCE[0]}")/lib/logging.sh"
 
 LIBS_TO_BUILD=""
 ARCHS_TO_BUILD=""
@@ -53,7 +54,7 @@ build_preload_musl() {
     
     if [ -f "$output_dir/${lib}.so" ]; then
         local size=$(ls -lh "$output_dir/${lib}.so" 2>/dev/null | awk '{print $5}')
-        echo "[$arch] Already built: ${lib}.so ($size)"
+        log_tool "$arch" "Already built: ${lib}.so ($size)"
         return 0
     fi
     
@@ -91,17 +92,17 @@ build_preload_musl() {
         sh2eb)       prefix="sh2eb-linux-musl" ;;
         sh4)         prefix="sh4-linux-musl" ;;
         sh4eb)       prefix="sh4eb-linux-musl" ;;
-        *)           echo "[$arch] Unknown architecture"; return 1 ;;
+        *)           log_tool "$arch" "Unknown architecture"; return 1 ;;
     esac
     
     local toolchain_dir="/build/toolchains/${prefix}-cross"
     if [ ! -d "$toolchain_dir" ]; then
-        echo "[$arch] Toolchain not found, building it first..."
+        log_tool "$arch" "Toolchain not found, building it first..."
         cd /build
         /scripts/build-unified.sh strace "$arch" >/dev/null 2>&1 || true
         
         if [ ! -d "$toolchain_dir" ]; then
-            echo "[$arch] Failed to create toolchain"
+            log_tool "$arch" "Failed to create toolchain"
             return 1
         fi
     fi
@@ -110,11 +111,11 @@ build_preload_musl() {
     local strip_cmd="${toolchain_dir}/bin/${prefix}-strip"
     
     if [ ! -x "$compiler" ]; then
-        echo "[$arch] Compiler not found: $compiler"
+        log_tool "$arch" "Compiler not found: $compiler"
         return 1
     fi
     
-    echo "[$arch] Building ${lib}.so..."
+    log_tool "$arch" "Building ${lib}.so..."
     
     local cflags="-fPIC -O2 -Wall -D_GNU_SOURCE -fno-strict-aliasing"
     local ldflags="-shared -Wl,-soname,${lib}.so"
@@ -128,23 +129,23 @@ build_preload_musl() {
             $strip_cmd "${lib}.so" 2>/dev/null || true
             
             cp "${lib}.so" "$output_dir/" || {
-                echo "[$arch] Failed to copy library"
+                log_tool "$arch" "Failed to copy library"
                 cd /
                 rm -rf "$build_dir"
                 return 1
             }
             
             local size=$(ls -lh "$output_dir/${lib}.so" 2>/dev/null | awk '{print $5}')
-            echo "[$arch] Successfully built: ${lib}.so ($size)"
+            log_tool "$arch" "Successfully built: ${lib}.so ($size)"
             
             cd /
             rm -rf "$build_dir"
             return 0
         else
-            echo "[$arch] Link failed"
+            log_tool "$arch" "Link failed"
         fi
     else
-        echo "[$arch] Compilation failed"
+        log_tool "$arch" "Compilation failed"
     fi
     
     cd /

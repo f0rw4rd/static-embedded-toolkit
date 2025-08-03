@@ -40,7 +40,7 @@ for arch in $ARCHITECTURES; do
     done
     
     JOB_COUNT=$((JOB_COUNT + 1))
-    echo "[$JOB_COUNT/24] Starting download for $arch..."
+    log_tool "$JOB_COUNT/24" "Starting download for $arch..."
     download_with_tracking "$arch" &
 done
 
@@ -81,7 +81,7 @@ echo "Failed: $FAILED"
 
 if [ "$FAILED" -gt 0 ]; then
     echo
-    echo "WARNING: $FAILED toolchain(s) failed to download"
+    log_warn "WARNING: $FAILED toolchain(s) failed to download"
     echo "Retrying failed downloads sequentially..."
     echo
     

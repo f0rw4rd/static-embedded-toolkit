@@ -74,32 +74,32 @@ FAILED=0
 for lib in "${LIBS_ARRAY[@]}"; do
     for arch in "${ARCHS_ARRAY[@]}"; do
         COUNT=$((COUNT + 1))
-        echo "[$COUNT/$TOTAL] Building $lib for $arch..."
+        log_tool "$COUNT/$TOTAL" "Building $lib for $arch..."
         
         if [ "$lib" = "libdesock" ]; then
             if [ "$LIBC_TYPE" = "musl" ]; then
-                echo "[$COUNT/$TOTAL] ⚠ Skipping libdesock for musl (only glibc supported)"
+                log_tool "$COUNT/$TOTAL" "⚠ Skipping libdesock for musl (only glibc supported)"
                 continue
             fi
             if build_libdesock "$arch"; then
-                echo "[$COUNT/$TOTAL] ✓ Successfully built $lib for $arch"
+                log_tool "$COUNT/$TOTAL" "✓ Successfully built $lib for $arch"
             else
-                echo "[$COUNT/$TOTAL] ✗ Failed to build $lib for $arch"
+                log_tool "$COUNT/$TOTAL" "✗ Failed to build $lib for $arch"
                 FAILED=$((FAILED + 1))
             fi
         else
             if [ "$LIBC_TYPE" = "musl" ]; then
                 if build_preload_library_musl "$lib" "$arch"; then
-                    echo "[$COUNT/$TOTAL] ✓ Successfully built $lib for $arch with musl"
+                    log_tool "$COUNT/$TOTAL" "✓ Successfully built $lib for $arch with musl"
                 else
-                    echo "[$COUNT/$TOTAL] ✗ Failed to build $lib for $arch with musl"
+                    log_tool "$COUNT/$TOTAL" "✗ Failed to build $lib for $arch with musl"
                     FAILED=$((FAILED + 1))
                 fi
             else
                 if build_preload_library "$lib" "$arch"; then
-                    echo "[$COUNT/$TOTAL] ✓ Successfully built $lib for $arch with glibc"
+                    log_tool "$COUNT/$TOTAL" "✓ Successfully built $lib for $arch with glibc"
                 else
-                    echo "[$COUNT/$TOTAL] ✗ Failed to build $lib for $arch with glibc"
+                    log_tool "$COUNT/$TOTAL" "✗ Failed to build $lib for $arch with glibc"
                     FAILED=$((FAILED + 1))
                 fi
             fi

@@ -3,6 +3,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/tools.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/lib/logging.sh"
 
 usage() {
     cat << EOF
@@ -117,40 +118,40 @@ do_build() {
     local arch=$2
     
     if ! setup_arch "$arch"; then
-        echo "[$arch] Failed to setup architecture"
+        log_tool "$arch" "Failed to setup architecture"
         return 1
     fi
     
     if [ "${DEBUG:-}" = "1" ]; then
-        echo "[$arch] DEBUG: CC=$CC, PATH=$PATH"
+        log_tool "$arch" "DEBUG: CC=$CC, PATH=$PATH"
     fi
     
     local log_file=""
     if [ "$LOG_ENABLED" = true ]; then
         log_file="/build/logs/build-${tool}-${arch}-$(date +%Y%m%d-%H%M%S).log"
-        echo "[$arch] Building $tool (log: $log_file)..."
+        log_tool "$arch" "Building $tool (log: $log_file)..."
         
         if [ "${DEBUG:-}" = "1" ]; then
-            echo "[$arch] DEBUG: Running build with verbose output..."
+            log_tool "$arch" "DEBUG: Running build with verbose output..."
             (set -x; build_tool "$tool" "$arch" "$MODE") 2>&1 | tee "$log_file"
         else
             (set -x; build_tool "$tool" "$arch" "$MODE") > "$log_file" 2>&1
         fi
     else
-        echo "[$arch] Building $tool..."
+        log_tool "$arch" "Building $tool..."
         build_tool "$tool" "$arch" "$MODE"
     fi
     
     local result=$?
     if [ $result -eq 0 ]; then
-        echo "[$arch] ✓ $tool built successfully"
+        log_tool "$arch" "✓ $tool built successfully"
         if [ "$LOG_ENABLED" = true ] && [ -n "$log_file" ]; then
             rm -f "$log_file"
             rm -f /build/logs/build-${tool}-${arch}-*.log
         fi
     else
-        echo "[$arch] ✗ $tool build failed"
-        [ -n "$log_file" ] && echo "[$arch] Check log: $log_file"
+        log_tool "$arch" "✗ $tool build failed"
+        [ -n "$log_file" ] && log_tool "$arch" "Check log: $log_file"
     fi
     return $result
 }
