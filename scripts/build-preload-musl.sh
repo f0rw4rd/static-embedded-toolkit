@@ -169,8 +169,8 @@ for lib in $LIBS_TO_BUILD; do
     done
 done
 
-echo "Total: $TOTAL"
-echo "Successful: $SUCCESS"
-echo "Failed: $FAILED"
+log_info "Total: $TOTAL"
+log_info "Successful: $SUCCESS"
+log_error "Failed: $FAILED"
 
 exit $FAILED

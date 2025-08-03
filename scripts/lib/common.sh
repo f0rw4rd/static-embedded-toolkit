@@ -10,7 +10,7 @@ download_toolchain() {
         return 0
     fi
     
-    echo "ERROR: Toolchain not found for $arch"
+    log_error "Toolchain not found for $arch"
     echo "Expected toolchain directory: $toolchain_dir"
     echo "Toolchains should be pre-downloaded during Docker image build"
     echo "Please rebuild the Docker image with: docker build -t stheno-toolkit ."
@@ -248,7 +248,7 @@ setup_arch() {
     if [ ! -d "/build/toolchains/$toolchain_dir/bin" ]; then
         echo "Toolchain for $arch not found, downloading..."
         download_toolchain "$arch" || {
-            echo "Failed to download toolchain for $arch"
+            log_error "Failed to download toolchain for $arch"
             return 1
         }
     fi
@@ -302,7 +302,7 @@ download_source() {
     if [ ! -f "/build/sources/$filename" ]; then
         echo "Downloading $name $version..."
         if ! wget -q --show-progress "$url" -O "/build/sources/$filename"; then
-            echo "Failed to download $name from $url"
+            log_error "Failed to download $name from $url"
             rm -f "/build/sources/$filename"
             return 1
         fi

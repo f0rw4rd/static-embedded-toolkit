@@ -234,14 +234,14 @@ main() {
     echo ""
     echo "Total builds: $total"
     echo "Successful: $success"
-    echo "Failed: $failed"
+    log_error "Failed: $failed"
     echo ""
     echo "End time: $(date)"
     
     if [ $failed -eq 0 ]; then
         echo "✓ All builds completed successfully"
     else
-        echo "✗ Some builds failed. Check logs for details."
+        log_error "✗ Some builds failed. Check logs for details."
     fi
     
     return $failed

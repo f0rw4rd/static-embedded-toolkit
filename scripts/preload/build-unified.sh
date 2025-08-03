@@ -111,6 +111,6 @@ done
 echo "Build Summary"
 echo "Total: $TOTAL"
 echo "Successful: $((TOTAL - FAILED))"
-echo "Failed: $FAILED"
+log_error "Failed: $FAILED"
 
 exit $FAILED

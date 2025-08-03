@@ -71,7 +71,7 @@ while [[ $# -gt 0 ]]; do
             elif [ -z "$ARCH" ]; then
                 ARCH="$1"
             else
-                echo "Error: Too many arguments"
+                log_error "Too many arguments"
                 usage
             fi
             shift
@@ -80,7 +80,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [ -z "$TOOL" ] || [ -z "$ARCH" ]; then
-    echo "Error: Missing required arguments"
+    log_error "Missing required arguments"
     usage
 fi
 
@@ -156,10 +156,10 @@ do_build() {
     return $result
 }
 
-echo "Tools: ${TOOLS_TO_BUILD[@]}"
-echo "Mode: $MODE"
-echo "Build mode: Sequential per architecture, parallel compilation"
-echo "Logging: $LOG_ENABLED"
+log_info "Tools: ${TOOLS_TO_BUILD[@]}"
+log_info "Mode: $MODE"
+log_info "Build mode: Sequential per architecture, parallel compilation"
+log_info "Logging: $LOG_ENABLED"
 echo
 
 TOTAL_BUILDS=$((${#TOOLS_TO_BUILD[@]} * ${#ARCHS_TO_BUILD[@]}))
@@ -188,10 +188,10 @@ BUILD_TIME=$((END_TIME - START_TIME))
 BUILD_MINS=$((BUILD_TIME / 60))
 BUILD_SECS=$((BUILD_TIME % 60))
 
-echo "Total builds: $TOTAL_BUILDS"
-echo "Completed: $COMPLETED"
-echo "Failed: $FAILED"
-echo "Build time: ${BUILD_MINS}m ${BUILD_SECS}s"
+log_info "Total builds: $TOTAL_BUILDS"
+log_info "Completed: $COMPLETED"
+log_error "Failed: $FAILED"
+log_info "Build time: ${BUILD_MINS}m ${BUILD_SECS}s"
 echo
 
 for arch in "${ARCHS_TO_BUILD[@]}"; do
